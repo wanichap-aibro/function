@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#39BDFF">
+<title>ความสัมพันธ์เป็นฟังก์ชันหรือไม่? | SmartMathPro Interactive</title>
+<style>
+  :root { --blue:#39BDFF; --deep:#113958; --ink:#17334C; --muted:#677F91; --border:#DDEBF5; --paper:#fff; --back:#EFF9FF; --yellow:#FFE268; --pink:#F9A2C0; --green:#12996D; --red:#D74764; --shadow:0 16px 46px rgba(30,102,151,.10); }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#F4F9FC;color:var(--ink);font-family:'Noto Sans Thai',Tahoma,'Sarabun',Arial,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+  button,select{font:inherit}
+  button{cursor:pointer}
+  button:focus-visible,select:focus-visible,[role="button"]:focus-visible{outline:3px solid #1772CC;outline-offset:4px}
+  .app{max-width:860px;width:100%;margin:26px auto 42px;background:white;border-radius:27px;border:1px solid #DCECF5;box-shadow:var(--shadow);overflow:hidden}
+  .hero{position:relative;background:var(--blue);padding:30px 33px 29px;color:#103B5B;overflow:hidden;isolation:isolate}
+  .hero:before{content:"";position:absolute;right:-69px;top:-112px;width:290px;height:290px;border:34px solid #ffffff59;border-radius:50%;z-index:-1}
+  .hero:after{content:"";position:absolute;right:105px;bottom:-116px;width:175px;height:175px;border:24px solid #FFE78880;border-radius:50%;z-index:-1}
+  .hero__eyebrow{display:inline-flex;gap:8px;align-items:center;border:1px solid #ffffff90;background:#ffffffba;border-radius:100px;font-size:12px;font-weight:800;padding:5px 12px;letter-spacing:.015em}
+  .hero h1{margin:12px 0 5px;font-size:clamp(24px,3.6vw,35px);line-height:1.35;letter-spacing:-.035em;font-weight:900}
+  .hero p{margin:0;font-size:15px;color:#1A5276;max-width:630px}
+  .hero__symbol{position:absolute;right:48px;top:45px;font-size:76px;font-weight:900;line-height:1;color:#FFFFFF88;transform:rotate(-13deg);pointer-events:none}
+  .content{padding:25px 30px 30px}
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;border-radius:16px;background:#EAF4FA;padding:6px;margin-bottom:22px}
+  .tab{border:0;border-radius:12px;background:transparent;color:#5B788D;font-size:15px;font-weight:800;padding:11px 7px;min-height:46px;transition:.15s}
+  .tab[aria-selected="true"]{background:#fff;color:#154A70;box-shadow:0 2px 8px #153A5320}
+  .stats{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;margin-bottom:14px}
+  .stat-label{font-size:12px;font-weight:700;color:var(--muted)}
+  .stat-value{font-size:18px;line-height:1.3;font-weight:900;color:var(--deep);font-variant-numeric:tabular-nums}
+  .stats .right{text-align:right}
+  .progress{height:8px;background:#EBF1F6;border-radius:999px;overflow:hidden;margin-bottom:21px}
+  .progress div{height:100%;background:linear-gradient(90deg,#25A5FF,#60CBEF);width:0;transition:width .35s;border-radius:999px}
+  .quiz-title{font-size:20px;font-weight:900;line-height:1.5;color:var(--deep);margin:0 0 5px}
+  .quiz-note{font-size:13px;color:var(--muted);margin:0 0 15px}
+  .diagram-wrap{border:2px solid #E1ECF4;border-radius:22px;background:linear-gradient(180deg,#fff 10%,#F9FCFF 100%);overflow:hidden;padding:6px 10px 4px;position:relative}
+  .diagram{width:100%;display:block;height:auto;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+  .diagram text{font-family:'Noto Sans Thai',Tahoma,Arial,sans-serif}
+  .diagram .node{transition:fill .13s,stroke .13s;cursor:default}
+  .diagram.builder .node{cursor:pointer}
+  .diagram .node-group{outline:none}
+  .diagram .node-group:focus-visible .node{stroke:#1F6FCC;stroke-width:4}
+  .diagram.builder .edge-hit{cursor:pointer}
+  .diagram.builder .edge-hit:hover + .edge-visual{stroke:var(--red)}
+  .diagram-legend{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px 20px;color:#6C869A;font-size:12px;padding:0 7px 12px}
+  .legend-item{display:flex;align-items:center;gap:6px}
+  .legend-dot{width:12px;height:12px;border-radius:50%;border:2px solid #259DDA;background:#F0FBFF}
+  .legend-dot.right{border-color:#EB80A3;background:#FFF1F6}
+  .answer-title{font-size:14px;font-weight:800;margin:22px 0 10px}
+  .answers{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .answer{min-height:65px;border:2px solid #D7E7F0;background:white;border-radius:17px;font-weight:900;color:#234760;font-size:17px;transition:transform .12s,border-color .12s,background .12s}
+  .answer:not(:disabled):hover{transform:translateY(-1px);border-color:#6BBFEA;background:#F0FBFF}
+  .answer:disabled{cursor:default}
+  .answer.correct{background:#E8FAF1;border-color:#1BAE75;color:#087E55}
+  .answer.wrong{background:#FFF0F2;border-color:#EF8CA1;color:#B82E4B}
+  .answer.dim{opacity:.65}
+  .actions{margin-top:15px;display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+  .btn{border:0;border-radius:13px;font-size:14px;font-weight:800;padding:11px 17px;transition:transform .12s,filter .12s;min-height:44px}
+  .btn:hover{filter:brightness(.985);transform:translateY(-1px)}
+  .btn-primary{background:#127ED3;color:#fff;box-shadow:0 3px 0 #0C5E9E}
+  .btn-soft{background:#EDF6FC;color:#24668E}
+  .btn-outline{background:#fff;color:#276F96;border:1.5px solid #CFE5F2}
+  .btn:disabled{opacity:.48;cursor:default;transform:none;box-shadow:none}
+  .feedback{margin-top:15px;border-radius:16px;border:1px solid #DCEBF4;padding:15px 17px;background:#F4FAFD;animation:rise .18s ease-out}
+  .feedback.success{background:#EBFAF2;border-color:#BDEBD5}
+  .feedback.error{background:#FFF4F5;border-color:#F5C8D1}
+  .feedback .headline{font-size:17px;font-weight:900;line-height:1.45;margin-bottom:4px}
+  .feedback.success .headline{color:#087C56}
+  .feedback.error .headline{color:#B93852}
+  .feedback p{margin:0;color:#36586E;font-size:14px}
+  .hint{background:#FFF9E4;border:1px solid #FFE69B;border-radius:12px;padding:10px 13px;color:#7A5B14;font-size:14px;margin-top:13px}
+  .mini-tip{margin-top:23px;display:flex;align-items:flex-start;gap:12px;border-radius:16px;background:#F0F9FF;border:1px solid #DAEAF5;padding:15px}
+  .tip-icon{width:35px;height:35px;flex:0 0 35px;display:grid;place-items:center;background:#FFE680;border-radius:10px;font-size:18px}
+  .mini-tip strong{display:block;font-size:14px;margin-bottom:1px}
+  .mini-tip p{font-size:13px;color:#627F92;margin:0}
+  .builder-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin:0 0 18px}
+  .builder-heading h2{font-size:20px;font-weight:900;color:var(--deep);margin:0 0 3px}
+  .builder-heading p{font-size:13px;color:var(--muted);margin:0}
+  .builder-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:15px}
+  .select-label{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:800;color:#557186}
+  .select-label select{border:1.5px solid #CBDFEA;border-radius:10px;background:#fff;color:#244A65;padding:7px 11px;min-height:39px;font-weight:800}
+  .builder-status{border:1px solid #DCEAF3;background:#F5FAFE;color:#54748C;border-radius:13px;font-size:13px;margin-top:12px;padding:11px 13px;min-height:43px}
+  .builder-status.selected{background:#FFFAE8;border-color:#F5DE92;color:#8C651C}
+  .builder-buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .builder-buttons .btn{flex:1 1 145px}
+  .builder-helper{margin-top:17px;font-size:13px;color:#617A8E;line-height:1.7}
+  .end-card{text-align:center;padding:33px 22px 26px;border-radius:22px;border:2px solid #DEEBF4;background:#F7FCFF}
+  .end-card .big-icon{font-size:53px;line-height:1.2}
+  .end-card h2{font-size:25px;line-height:1.4;color:var(--deep);margin:10px 0}
+  .end-card .big-score{font-size:48px;line-height:1.2;font-weight:900;color:#167BBF;margin:0 0 8px}
+  .end-card p{color:#607E90;font-size:14px;margin:0 0 17px}
+  .end-card .btn{min-width:180px}
+  .footer{margin-top:22px;padding-top:15px;border-top:1px solid #E8EFF5;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;color:#8AA0AE;font-size:11px}
+  .footer strong{color:#4E91B6;font-weight:900}
+  [hidden]{display:none!important}
+  @keyframes rise{from{opacity:.5;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:650px){.app{margin:0 auto;border-radius:0;box-shadow:none;border:0}.hero{padding:23px 19px 22px}.hero__symbol{right:16px;top:53px;font-size:59px}.hero h1{max-width:330px}.hero p{font-size:13px;max-width:335px}.content{padding:18px 15px 27px}.stat-value{font-size:16px}.stats{gap:8px}.tab{font-size:13px}.diagram-wrap{padding:0}.quiz-title,.builder-heading h2{font-size:18px}.answer{min-height:60px;font-size:15px}.btn{font-size:13px}.mini-tip{padding:12px}.diagram-legend{gap:8px 12px;font-size:11px;padding-bottom:10px}.builder-controls{gap:9px}}
+  @media(max-width:370px){.hero h1{font-size:23px}.hero__symbol{font-size:48px}.stats{grid-template-columns:1fr auto auto}.stat-value{font-size:15px}.answer{font-size:14px}}
+  @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="app" aria-label="Interactive ความสัมพันธ์และฟังก์ชัน">
+  <header class="hero">
+    <span class="hero__eyebrow">✦ SMARTMATHPRO INTERACTIVE</span>
+    <h1>ความสัมพันธ์เป็น<br>ฟังก์ชันหรือไม่?</h1>
+    <p>ฝึกดูแผนภาพลูกศรจากเซต A ไปเซต B แล้วตอบให้ถูก!</p>
+    <div class="hero__symbol" aria-hidden="true">ƒ(x)</div>
+  </header>
+  <div class="content">
+    <div class="tabs" role="tablist" aria-label="เลือกโหมด">
+      <button type="button" class="tab" id="quiz-tab" role="tab" aria-selected="true" aria-controls="quiz-panel">✏️ ฝึกทำโจทย์</button>
+      <button type="button" class="tab" id="builder-tab" role="tab" aria-selected="false" aria-controls="builder-panel">↗ สร้างแผนภาพเอง</button>
+    </div>
+    <section id="quiz-panel" role="tabpanel" aria-labelledby="quiz-tab">
+      <div id="quiz-main">
+        <div class="stats">
+          <div><div class="stat-label">ความคืบหน้า</div><div class="stat-value" id="quiz-number">ข้อ 1 / 10</div></div>
+          <div class="right"><div class="stat-label">คะแนนรอบนี้</div><div class="stat-value" id="quiz-score">0 / 100</div></div>
+          <div class="right"><div class="stat-label">สถิติสูงสุด</div><div class="stat-value" id="quiz-best">0</div></div>
+        </div>
+        <div class="progress" aria-hidden="true"><div id="progress-bar"></div></div>
+        <h2 class="quiz-title">แผนภาพนี้เป็นฟังก์ชันจาก A ไป B หรือไม่?</h2>
+        <p class="quiz-note">พิจารณาลูกศรที่ออกจากสมาชิกทุกตัวของเซต A</p>
+        <div class="diagram-wrap">
+          <svg id="quiz-svg" class="diagram" viewBox="0 0 680 330" role="img" aria-label="แผนภาพแสดงความสัมพันธ์ระหว่างเซต A และ B"></svg>
+          <div class="diagram-legend"><span class="legend-item"><i class="legend-dot"></i> เซต A (โดเมน)</span><span class="legend-item"><i class="legend-dot right"></i> เซต B</span></div>
+        </div>
+        <div class="answer-title">เลือกคำตอบที่ถูกต้อง</div>
+        <div class="answers">
+          <button class="answer" id="answer-yes" type="button">✓ เป็นฟังก์ชัน</button>
+          <button class="answer" id="answer-no" type="button">✕ ไม่เป็นฟังก์ชัน</button>
+        </div>
+        <div class="feedback" id="quiz-feedback" role="status" aria-live="polite" hidden></div>
+        <div class="hint" id="quiz-hint" hidden>💡 <b>คำใบ้:</b> ไล่ดูสมาชิกในเซต A ทีละตัวว่ามีลูกศรออกไปกี่เส้น ต้องมี <b>1 เส้นพอดี</b> ทุกตัว จึงจะเป็นฟังก์ชัน</div>
+        <div class="actions">
+          <button type="button" class="btn btn-soft" id="hint-button">💡 ขอคำใบ้</button>
+          <button type="button" class="btn btn-primary" id="next-button" hidden>ข้อถัดไป →</button>
+        </div>
+      </div>
+      <div class="end-card" id="quiz-end" hidden>
+        <div class="big-icon">🏆</div>
+        <h2 id="end-title">ทำครบแล้ว!</h2>
+        <div class="big-score" id="end-score">0 / 100</div>
+        <p id="end-subtitle">มาเล่นอีกครั้งเพื่อทำสถิติใหม่กัน</p>
+        <button type="button" class="btn btn-primary" id="replay-button">↻ เล่นอีกครั้ง</button>
+      </div>
+    </section>
+    <section id="builder-panel" role="tabpanel" aria-labelledby="builder-tab" hidden>
+      <div class="builder-heading"><div><h2>ลองสร้างความสัมพันธ์ด้วยตัวเอง</h2><p>คลิกสมาชิกใน A แล้วคลิกสมาชิกใน B หรือลากลูกศรไปหา B</p></div></div>
+      <div class="builder-controls">
+        <label class="select-label">สมาชิก A <select id="a-count" aria-label="จำนวนสมาชิกของ A"><option value="2">2 ตัว</option><option value="3" selected>3 ตัว</option><option value="4">4 ตัว</option><option value="5">5 ตัว</option></select></label>
+        <label class="select-label">สมาชิก B <select id="b-count" aria-label="จำนวนสมาชิกของ B"><option value="2">2 ตัว</option><option value="3" selected>3 ตัว</option><option value="4">4 ตัว</option><option value="5">5 ตัว</option></select></label>
+      </div>
+      <div class="diagram-wrap">
+        <svg id="builder-svg" class="diagram builder" viewBox="0 0 680 330" role="group" aria-label="แผนภาพลูกศรที่แก้ไขได้"></svg>
+        <div class="diagram-legend"><span class="legend-item"><i class="legend-dot"></i> คลิก A เพื่อเลือกต้นทาง</span><span class="legend-item"><i class="legend-dot right"></i> คลิก B เพื่อเชื่อมลูกศร</span></div>
+      </div>
+      <div id="builder-status" class="builder-status" role="status" aria-live="polite">เลือกสมาชิกใน A แล้วเลือกสมาชิกใน B เพื่อเพิ่มลูกศร หรือคลิกลูกศรเดิมเพื่อลบ</div>
+      <div class="builder-buttons">
+        <button type="button" class="btn btn-primary" id="check-builder">✓ ตรวจว่าเป็นฟังก์ชันไหม</button>
+        <button type="button" class="btn btn-outline" id="clear-builder">ล้างลูกศร</button>
+        <button type="button" class="btn btn-soft" id="sample-builder">สุ่มตัวอย่าง</button>
+      </div>
+      <div class="feedback" id="builder-feedback" role="status" aria-live="polite" hidden></div>
+      <p class="builder-helper">หมายเหตุ: สมาชิกของเซต A แต่ละตัวต้องมีลูกศรออก <strong>1 เส้นเท่านั้น</strong> แต่สมาชิกหลายตัวของ A สามารถชี้ไปสมาชิกตัวเดียวกันใน B ได้</p>
+    </section>
+    <aside class="mini-tip"><div class="tip-icon" aria-hidden="true">🔎</div><div><strong>จำให้แม่น: หนึ่งตัวใน A → หนึ่งคำตอบใน B</strong><p>ลูกศรออกจาก A ขาดก็ไม่ได้ เกินก็ไม่ได้ แต่ลูกศรจาก A หลายตัวสามารถมาชี้ B ตัวเดียวกันได้</p></div></aside>
+    <footer class="footer"><span><strong>SmartMathPro</strong> · ความสัมพันธ์และฟังก์ชัน</span><span>คะแนนสูงสุดบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น</span></footer>
+  </div>
+</main>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+const BEST_KEY='smp_mapping_function_best_v1';
+const readBest=()=>{try{return Math.max(0, Math.min(100,parseInt(localStorage.getItem(BEST_KEY),10)||0));}catch(_){return 0;}};
+const saveBest=n=>{try{localStorage.setItem(BEST_KEY,String(n));}catch(_){}};
+const clone=o=>JSON.parse(JSON.stringify(o));
+const itemsA=['1','2','3','4','5'];
+const itemsB=['a','b','c','d','e'];
+const bank=[
+ {a:['1','2','3'],b:['a','b','c'],e:[[0,1],[1,0],[2,2]]},
+ {a:['1','2','3'],b:['a','b','c'],e:[[0,0],[1,0],[2,2]]},
+ {a:['2','4','6','8'],b:['1','3','5'],e:[[0,2],[1,1],[2,2],[3,0]]},
+ {a:['-1','0','1'],b:['0','1'],e:[[0,1],[1,1],[2,1]]},
+ {a:['1','2','3','4'],b:['a','b','c','d'],e:[[0,2],[1,3],[2,0],[3,1]]},
+ {a:['0','1'],b:['a','b','c'],e:[[0,0],[1,2]]},
+ {a:['1','2','3'],b:['a','b','c'],e:[[0,0],[0,1],[1,2],[2,0]]},
+ {a:['1','2','3'],b:['a','b','c'],e:[[0,2],[2,0]]},
+ {a:['1','2','3','4'],b:['a','b','c'],e:[[0,1],[1,0],[1,2],[2,1],[3,2]]},
+ {a:['-2','0','2'],b:['p','q','r'],e:[[0,1],[1,0],[1,1]]},
+ {a:['1','2','3'],b:['4','5','6'],e:[[0,0],[1,2]]},
+ {a:['1','2','3','4'],b:['a','b'],e:[[0,0],[1,0],[2,0],[3,0],[3,1]]},
+ {a:['1','2','3'],b:['a','b'],e:[[0,0],[1,1],[2,1]]},
+ {a:['0','1','2','3'],b:['x','y','z'],e:[[0,0],[1,0],[2,2],[3,2]]}
+];
+function inspect(data){
+ const count=data.a.map((_,i)=>data.e.filter(([x])=>x===i).length);
+ const missing=count.map((n,i)=>n===0?data.a[i]:null).filter(x=>x!==null);
+ const multiple=count.map((n,i)=>n>1?{value:data.a[i],n}:null).filter(Boolean);
+ return {valid:missing.length===0&&multiple.length===0,count,missing,multiple};
+}
+function describe(data){
+ const t=inspect(data);
+ if(t.valid){const sameB=new Set(data.e.map(edge=>edge[1])).size<data.e.length;return 'สมาชิกทุกตัวของเซต A มีลูกศรออกไปยัง B เพียง 1 เส้นพอดี จึงเป็นฟังก์ชัน'+(sameB?' แม้มีลูกศรหลายเส้นชี้ไปยังสมาชิกตัวเดียวกันใน B ก็ยังเป็นฟังก์ชันได้':'');}
+ const reasons=[];
+ if(t.missing.length)reasons.push('สมาชิก '+t.missing.map(x=>'\u201c'+x+'\u201d').join(', ')+' ใน A ไม่มีลูกศรออก');
+ if(t.multiple.length)reasons.push('สมาชิก '+t.multiple.map(o=>'\u201c'+o.value+'\u201d ('+o.n+' เส้น)').join(', ')+' ใน A มีลูกศรออกมากกว่า 1 เส้น');
+ return reasons.join(' และ ')+' จึงไม่เป็นฟังก์ชัน เพราะสมาชิกทุกตัวใน A ต้องมีลูกศรออกไป 1 เส้นพอดี';
+}
+function shuffle(array){let a=[...array];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function getQuestions(){const good=shuffle(bank.filter(x=>inspect(x).valid)).slice(0,5);const bad=shuffle(bank.filter(x=>!inspect(x).valid)).slice(0,5);return shuffle([...good,...bad]).map(clone);}
+let rounds=[],question=0,points=0,done=false,best=readBest(),hint=false;
+const editing={a:itemsA.slice(0,3),b:itemsB.slice(0,3),e:[[0,1],[1,1],[2,2]]};
+let selected=null,checkedBuilder=false,dragging=null;
+const append=(parent, tag, attrs={}, text)=>{const e=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,String(v));if(text!==undefined)e.textContent=text;parent.appendChild(e);return e;};
+function spaced(n){const low=87,high=256;if(n===1)return [173];return Array.from({length:n},(_,i)=>low+(high-low)*i/(n-1));}
+function renderDiagram(id,data,{builder=false,checked=false}={}){
+ const svg=$(id);svg.replaceChildren();
+ const compact=window.innerWidth<=520;
+ const w=compact?500:680;
+ const lx=compact?119:166, rx=compact?380:513, cy=171;
+ const ysA=spaced(data.a.length),ysB=spaced(data.b.length);
+ const radius=compact?20:22;
+ svg.setAttribute('viewBox',`0 0 ${w} 330`);
+ const defs=append(svg,'defs');
+ for(const [name,color] of [['arrow','#578AA8'],['arrow-bad','#DD566B'],['arrow-good','#1BA578']]){
+   const mark=append(defs,'marker',{id:`${id}-${name}`,viewBox:'0 0 10 10',refX:'8.5',refY:'5',markerWidth:'6.8',markerHeight:'6.8',orient:'auto-start-reverse',markerUnits:'userSpaceOnUse'});
+   append(mark,'path',{d:'M 0 0 L 10 5 L 0 10 z',fill:color});
+ }
+ append(svg,'rect',{x:10,y:18,width:w-20,height:300,rx:17,fill:'#FAFDFF'});
+ append(svg,'ellipse',{cx:lx,cy,rx:compact?76:91,ry:145,fill:'#ECF9FF',stroke:'#78C9F0','stroke-width':2.8});
+ append(svg,'ellipse',{cx:rx,cy,rx:compact?76:91,ry:145,fill:'#FFF1F6',stroke:'#F3A6BF','stroke-width':2.8});
+ append(svg,'rect',{x:lx-35,y:5,width:70,height:34,rx:17,fill:'#36B5EE'});
+ append(svg,'text',{x:lx,y:28,'font-size':18,'font-weight':900,'text-anchor':'middle',fill:'#fff'},'เซต A');
+ append(svg,'rect',{x:rx-35,y:5,width:70,height:34,rx:17,fill:'#EB8EAD'});
+ append(svg,'text',{x:rx,y:28,'font-size':18,'font-weight':900,'text-anchor':'middle',fill:'#fff'},'เซต B');
+ const analysis=checked?inspect(data):null;
+ const edgeLayer=append(svg,'g',{'class':'edge-layer'});
+ data.e.forEach(([i,j],edgeIdx)=>{
+   if(i<0||j<0||i>=data.a.length||j>=data.b.length)return;
+   const sx=lx+radius+4,tx=rx-radius-12,sy=ysA[i],ty=ysB[j];
+   const d=`M ${sx} ${sy} L ${tx} ${ty}`;
+   const bad=analysis&&analysis.count[i]!==1;
+   const stroke=analysis?(bad?'#DD566B':'#1BA578'):'#578AA8';
+   const edgeGroup=append(edgeLayer,'g',{'data-i':i,'data-j':j});
+   if(builder){
+     const hit=append(edgeGroup,'path',{d,stroke:'transparent','stroke-width':24,fill:'none',class:'edge-hit','pointer-events':'stroke',role:'button',tabindex:'0','aria-label':`ลบลูกศรจาก ${data.a[i]} ไป ${data.b[j]}`});
+     hit.addEventListener('click',(event)=>{event.stopPropagation();removeEdge(i,j)});
+     hit.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();removeEdge(i,j)}});
+     hit.addEventListener('pointerdown',event=>event.stopPropagation());
+   }
+   append(edgeGroup,'path',{d,fill:'none',stroke,'stroke-width':checked?3.4:3,'stroke-linecap':'round','marker-end':`url(#${id}-${analysis?(bad?'arrow-bad':'arrow-good'):'arrow'})`,class:'edge-visual','pointer-events':'none'});
+ });
+ if(builder)append(svg,'g',{'id':'temporary-arrow'});
+ for(const [side,arr,x,ys] of [['A',data.a,lx,ysA],['B',data.b,rx,ysB]]){
+   arr.forEach((value,index)=>{
+     const invalid=analysis&&side==='A'&&analysis.count[index]!==1;
+     const good=analysis&&side==='A'&&!invalid;
+     const active=builder&&side==='A'&&selected===index;
+     const fill=invalid?'#FFE8ED':good?'#E2F8ED':active?'#FFE68A':'#fff';
+     const stroke=invalid?'#DD566B':good?'#1AA272':active?'#D5A82F':side==='A'?'#259FDC':'#E98DAE';
+     const group=append(svg,'g',{'class':'node-group',role:builder?'button':'img',tabindex:builder?'0':'-1','aria-label':`${side} สมาชิก ${value}`});
+     if(builder){
+       group.style.cursor='pointer';
+       group.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();if(side==='A')chooseLeft(index);else chooseRight(index)}});
+       if(side==='A')group.addEventListener('pointerdown',ev=>startDrag(ev,index));
+       else group.addEventListener('click',()=>chooseRight(index));
+     }
+     append(group,'circle',{cx:x,cy:ys[index],r:radius,fill,stroke,'stroke-width':active?3.9:2.5,class:'node'});
+     append(group,'text',{x,y:ys[index]+6,'font-size':18,'font-weight':850,'text-anchor':'middle','pointer-events':'none',fill:'#153D5A'},value);
+   });
+ }
+ if(builder)svg.addEventListener('pointermove',onPointerMove);
+ if(builder)svg.addEventListener('pointerup',onPointerUp);
+ if(builder)svg.addEventListener('pointercancel',onPointerCancel);
+ svg.setAttribute('aria-label',builder?'แผนภาพที่กำหนดลูกศรได้ เซต A มี '+data.a.length+' สมาชิก เซต B มี '+data.b.length+' สมาชิก':'แผนภาพความสัมพันธ์ เซต A มี '+data.a.length+' สมาชิก เซต B มี '+data.b.length+' สมาชิก มีลูกศร '+data.e.length+' เส้น');
+}
+function updateStats(){ $('quiz-number').textContent=`ข้อ ${question+1} / ${rounds.length}`;$('quiz-score').textContent=`${points} / 100`;$('quiz-best').textContent=String(best);$('progress-bar').style.width=`${(question/rounds.length)*100}%`; }
+function renderQuestion(){done=false;hint=false;updateStats();renderDiagram('quiz-svg',rounds[question]);$('quiz-hint').hidden=true;$('quiz-feedback').hidden=true;$('next-button').hidden=true;$('hint-button').disabled=false;for(const id of ['answer-yes','answer-no']){const btn=$(id);btn.disabled=false;btn.className='answer';}}
+function beginQuiz(){rounds=getQuestions();question=0;points=0;best=readBest();$('quiz-main').hidden=false;$('quiz-end').hidden=true;renderQuestion();}
+function answer(choice){if(done)return;done=true;const data=rounds[question];const correct=inspect(data).valid;const success=correct===choice;if(success)points+=10;for(const [id,v] of [['answer-yes',true],['answer-no',false]]){const btn=$(id);btn.disabled=true;btn.className='answer '+(v===correct?'correct':v===choice?'wrong':'dim');}renderDiagram('quiz-svg',data,{checked:true});$('quiz-score').textContent=`${points} / 100`;$('quiz-feedback').className='feedback '+(success?'success':'error');$('quiz-feedback').innerHTML=`<div class="headline">${success?'🎉 ถูกต้อง! +10 คะแนน':'ลองใหม่ในข้อถัดไปนะ! คำตอบที่ถูกคือ '+(correct?'เป็นฟังก์ชัน':'ไม่เป็นฟังก์ชัน')}</div><p>${escapeHTML(describe(data))}</p>`;$('quiz-feedback').hidden=false;$('quiz-hint').hidden=true;$('hint-button').disabled=true;$('next-button').hidden=false;$('next-button').textContent=question===rounds.length-1?'ดูสรุปคะแนน →':'ข้อถัดไป →';$('progress-bar').style.width=`${((question+1)/rounds.length)*100}%`;}
+function escapeHTML(v){return String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function finish(){const old=best;if(points>best){best=points;saveBest(points);}$('quiz-main').hidden=true;$('quiz-end').hidden=false;$('end-score').textContent=`${points} / 100`;$('end-title').textContent=points===100?'เก่งมาก! เต็ม 100 🎉':points>=70?'ทำได้ดีมาก!':'ทำครบ 10 ข้อแล้ว!';$('end-subtitle').textContent=points>old?'🏅 สถิติใหม่ของคุณ! คะแนนสูงสุดถูกบันทึกไว้ในเครื่องนี้แล้ว':'ฝึกต่อได้เรื่อย ๆ และกลับมาทำสถิติใหม่ได้';}
+function switchMode(mode){const quiz=mode==='quiz';$('quiz-tab').setAttribute('aria-selected',quiz);$('builder-tab').setAttribute('aria-selected',!quiz);$('quiz-panel').hidden=!quiz;$('builder-panel').hidden=quiz;if(!quiz)renderBuilder();}
+function renderBuilder(){renderDiagram('builder-svg',editing,{builder:true,checked:checkedBuilder});}
+function status(txt,chosen=false){$('builder-status').textContent=txt;$('builder-status').className='builder-status'+(chosen?' selected':'');}
+function invalidate(){checkedBuilder=false;$('builder-feedback').hidden=true;}
+function chooseLeft(i){selected=i;status(`เลือก ${editing.a[i]} ในเซต A แล้ว → คลิกสมาชิกในเซต B เพื่อสร้างลูกศร`,true);renderBuilder();}
+function chooseRight(j){if(selected===null){status('กรุณาเลือกสมาชิกใน A ก่อน แล้วจึงเลือกสมาชิกใน B');return;}addEdge(selected,j);selected=null;status('เพิ่มลูกศรแล้ว! เลือกสมาชิกใน A เพื่อต่อเส้นถัดไป');renderBuilder();}
+function addEdge(i,j){if(!editing.e.some(([a,b])=>a===i&&b===j)){editing.e.push([i,j]);invalidate();}else{status('มีลูกศรเส้นนี้อยู่แล้ว หากต้องการลบ ให้คลิกลูกศรโดยตรง');}}
+function removeEdge(i,j){editing.e=editing.e.filter(([a,b])=>a!==i||b!==j);invalidate();selected=null;status('ลบลูกศรแล้ว');renderBuilder();}
+function checkBuilder(){selected=null;dragging=null;checkedBuilder=true;const report=inspect(editing);$('builder-feedback').className='feedback '+(report.valid?'success':'error');$('builder-feedback').innerHTML=`<div class="headline">${report.valid?'✓ เป็นฟังก์ชัน':'✕ ไม่เป็นฟังก์ชัน'}</div><p>${escapeHTML(describe(editing))}</p>`;$('builder-feedback').hidden=false;status('ตรวจเสร็จแล้ว: สมาชิกใน A สีแดงคือจุดที่มีลูกศรไม่ครบหรือมากเกิน 1 เส้น');renderBuilder();}
+function resetCounts(){editing.a=itemsA.slice(0,Number($('a-count').value));editing.b=itemsB.slice(0,Number($('b-count').value));editing.e=[];selected=null;invalidate();status('ปรับจำนวนสมาชิกแล้ว ลองเชื่อมลูกศรตามต้องการ');renderBuilder();}
+function randomBuilder(){const countA=Number($('a-count').value),countB=Number($('b-count').value);editing.a=itemsA.slice(0,countA);editing.b=itemsB.slice(0,countB);editing.e=[];const makeCorrect=Math.random()<.5;for(let i=0;i<countA;i++)editing.e.push([i,Math.floor(Math.random()*countB)]);if(!makeCorrect){const i=Math.floor(Math.random()*countA);if(Math.random()<.5)editing.e=editing.e.filter(([from])=>from!==i);else{let next=(editing.e.find(([from])=>from===i)[1]+1)%countB;editing.e.push([i,next]);}}selected=null;invalidate();status('สุ่มแผนภาพใหม่แล้ว! ลองทายก่อนกดตรวจ');renderBuilder();}
+function svgPos(svg,clientX,clientY){const p=svg.createSVGPoint();p.x=clientX;p.y=clientY;const m=svg.getScreenCTM();return m?p.matrixTransform(m.inverse()):{x:0,y:0};}
+function startDrag(ev,i){if(ev.button!==undefined&&ev.button!==0)return;const svg=$('builder-svg');selected=i;dragging={i,pointerId:ev.pointerId,origin:svgPos(svg,ev.clientX,ev.clientY),moved:false};try{svg.setPointerCapture(ev.pointerId)}catch(_){ }status(`เลือก ${editing.a[i]} ใน A แล้ว ลากไปยัง B หรือแตะสมาชิกใน B`,true);}
+function onPointerMove(ev){if(!dragging||ev.pointerId!==dragging.pointerId)return;const svg=$('builder-svg');const p=svgPos(svg,ev.clientX,ev.clientY);if(Math.hypot(p.x-dragging.origin.x,p.y-dragging.origin.y)>8)dragging.moved=true;const w=window.innerWidth<=520?500:680;const lx=w===500?119:166;const fromY=spaced(editing.a.length)[dragging.i];const layer=$('temporary-arrow');if(!layer)return;layer.replaceChildren();if(dragging.moved)append(layer,'path',{d:`M ${lx+24} ${fromY} L ${p.x} ${p.y}`,fill:'none',stroke:'#F0AD37','stroke-width':3,'stroke-dasharray':'7 6','pointer-events':'none'});}
+function onPointerUp(ev){if(!dragging||ev.pointerId!==dragging.pointerId)return;const d=dragging;dragging=null;const svg=$('builder-svg');const p=svgPos(svg,ev.clientX,ev.clientY);const rx=window.innerWidth<=520?380:513;const match=spaced(editing.b.length).findIndex(y=>Math.hypot(p.x-rx,p.y-y)<34);if(d.moved&&match!==-1){addEdge(d.i,match);selected=null;status('เชื่อมลูกศรสำเร็จ! ลากต่อได้เลย');}else if(d.moved){status('ยังไม่ได้เชื่อมลูกศร กรุณาลากไปปล่อยที่วงกลมในเซต B');}renderBuilder();}
+function onPointerCancel(ev){if(!dragging||ev.pointerId!==dragging.pointerId)return;dragging=null;renderBuilder();}
+$('quiz-tab').addEventListener('click',()=>switchMode('quiz'));
+$('builder-tab').addEventListener('click',()=>switchMode('builder'));
+$('answer-yes').addEventListener('click',()=>answer(true));
+$('answer-no').addEventListener('click',()=>answer(false));
+$('hint-button').addEventListener('click',()=>{$('quiz-hint').hidden=false;});
+$('next-button').addEventListener('click',()=>{if(question>=rounds.length-1)finish();else{question++;renderQuestion();}});
+$('replay-button').addEventListener('click',beginQuiz);
+$('a-count').addEventListener('change',resetCounts);
+$('b-count').addEventListener('change',resetCounts);
+$('check-builder').addEventListener('click',checkBuilder);
+$('clear-builder').addEventListener('click',()=>{editing.e=[];selected=null;invalidate();status('ล้างลูกศรทั้งหมดแล้ว! คลิกสมาชิกใน A เพื่อเริ่มใหม่');renderBuilder();});
+$('sample-builder').addEventListener('click',randomBuilder);
+let resizeState=window.innerWidth<=520;window.addEventListener('resize',()=>{const v=window.innerWidth<=520;if(v!==resizeState){resizeState=v;if(rounds.length)renderDiagram('quiz-svg',rounds[question],{checked:done});if(!$('builder-panel').hidden)renderBuilder();}});
+beginQuiz();
+})();
+</script>
+</body>
+</html>
